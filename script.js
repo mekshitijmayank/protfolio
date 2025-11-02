@@ -186,7 +186,7 @@ function createScrollToTop() {
 createScrollToTop();
 
 // Add fade-in animation on scroll
-const fadeElements = document.querySelectorAll('.about, .skills, .education, .projects, .contact');
+const fadeElements = document.querySelectorAll('.about, .skills, .education, .achievements, .projects, .contact');
 
 const fadeObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -205,5 +205,124 @@ fadeElements.forEach(element => {
     element.style.transform = 'translateY(20px)';
     element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     fadeObserver.observe(element);
+});
+
+// Microinteractions: Add click ripple effect to buttons
+document.querySelectorAll('.btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.cssText = `
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            left: ${x}px;
+            top: ${y}px;
+            pointer-events: none;
+            transform: scale(0);
+            animation: ripple 0.6s ease-out;
+        `;
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 600);
+    });
+});
+
+// Add ripple animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Parallax effect on scroll for hero section
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const heroImage = document.querySelector('.hero-image');
+    if (heroImage) {
+        heroImage.style.transform = `translateY(${scrolled * 0.3}px)`;
+    }
+});
+
+// Add typewriter effect to hero subtitle (optional enhancement)
+const heroSubtitle = document.querySelector('.hero-subtitle');
+if (heroSubtitle) {
+    const text = heroSubtitle.textContent;
+    heroSubtitle.textContent = '';
+    let index = 0;
+    
+    function typeWriter() {
+        if (index < text.length) {
+            heroSubtitle.textContent += text.charAt(index);
+            index++;
+            setTimeout(typeWriter, 100);
+        }
+    }
+    
+    // Uncomment to enable typing animation
+    // setTimeout(typeWriter, 500);
+}
+
+// Add stagger animation to achievement cards
+const achievementCards = document.querySelectorAll('.achievement-card');
+const achievementObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }, index * 150);
+            achievementObserver.unobserve(entry.target);
+        }
+    });
+}, {
+    threshold: 0.2
+});
+
+achievementCards.forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'all 0.5s ease';
+    achievementObserver.observe(card);
+});
+
+// Add hover sound effect (optional - can be removed)
+// This creates a subtle interaction feel
+document.querySelectorAll('.project-card, .achievement-card, .skill-category').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    });
+});
+
+// Add cursor trail effect (optional - makes it feel more interactive)
+let cursorTrail = [];
+const maxTrailLength = 10;
+
+document.addEventListener('mousemove', (e) => {
+    if (window.innerWidth > 768) {
+        cursorTrail.push({
+            x: e.clientX,
+            y: e.clientY,
+            time: Date.now()
+        });
+        
+        if (cursorTrail.length > maxTrailLength) {
+            cursorTrail.shift();
+        }
+        
+        cursorTrail = cursorTrail.filter(point => Date.now() - point.time < 300);
+    }
 });
 
